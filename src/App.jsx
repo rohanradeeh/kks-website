@@ -173,7 +173,7 @@ const App = () => {
               <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-500/20 blur-3xl"></div>
               
               <img 
-                src="public\event1.jpg" 
+                src="public/event1.jpg" 
                 alt="Kerala Boat Race" 
                 className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40"
               />
