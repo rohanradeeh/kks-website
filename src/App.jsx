@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Calendar, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCallIcon } from 'lucide-react';
-
+const getAssetPath = (path) => {
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    return `${import.meta.env.BASE_URL}${cleanPath}`;
+  };
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
