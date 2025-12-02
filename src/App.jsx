@@ -97,7 +97,7 @@ const App = () => {
           <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white">
               <img 
-                src="/KeralaKalaSamitiLogo.jpg" 
+                src="kks-website/public/KeralaKalaSamitiLogo.jpg" 
                 alt="KKS Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
