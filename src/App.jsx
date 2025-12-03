@@ -26,7 +26,6 @@ const App = () => {
     id: i,
     src: `/gallery/${i + 1}.jpg`, 
     alt: `Gallery Image ${i + 1}`,
-    fallback: `https://images.unsplash.com/photo-1602216056096-3b40cc0c9947?q=80&w=600&auto=format&fit=crop` // Fallback if local image missing
   }));
 
   // Handle scroll effect for navbar
