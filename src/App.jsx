@@ -16,7 +16,7 @@ const App = () => {
   // ---------------------------------------------------------------------------
   const facebookPageUrl = "https://www.facebook.com/keralakalasamitibbsr/"; 
   const encodedFbUrl = encodeURIComponent(facebookPageUrl);
-
+  const baseUrl="./"
   // ---------------------------------------------------------------------------
   // GALLERY CONFIGURATION
   // ---------------------------------------------------------------------------
@@ -24,8 +24,8 @@ const App = () => {
   // The user must place images in the 'public/gallery' folder named 1.jpg through 50.jpg
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
-    src: `/gallery/${i + 1}.jpg`, 
-    alt: `Gallery Image ${i + 1}`,
+    src: `${baseUrl}gallery/${i + 1}.jpg`, 
+    alt: `Gallery Image ${i + 1}`
   }));
 
   // Handle scroll effect for navbar
@@ -72,7 +72,7 @@ const App = () => {
 
   const handleMembershipClick = () => {
     const link = document.createElement('a');
-    link.href = "/KKS_MEMBERSHIP_FORM.pdf"; 
+    link.href = "${baseURL}KKS_MEMBERSHIP_FORM.pdf"; 
     link.download = 'KKS_MEMBERSHIP_FORM.pdf';
     document.body.appendChild(link);
     link.click();
@@ -459,7 +459,6 @@ const App = () => {
                       src={img.src} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                       alt={img.alt} 
-                      onError={(e) => { e.target.src = img.fallback; }}
                     />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>
@@ -532,12 +531,6 @@ const App = () => {
                     alt={img.alt} 
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                     loading="lazy"
-                    onError={(e) => { 
-                      // Prevent infinite loop if fallback also fails
-                      if (e.target.src !== img.fallback) {
-                        e.target.src = img.fallback;
-                      }
-                    }}
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <span className="text-white font-medium text-sm border border-white/50 px-3 py-1 rounded-full backdrop-blur-sm">View</span>
