@@ -99,7 +99,7 @@ const App = () => {
           <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white">
               <img 
-                src="kks-website/public/KeralaKalaSamitiLogo.jpg" 
+                src="${baseURL}KeralaKalaSamitiLogo.jpg" 
                 alt="KKS Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -175,7 +175,7 @@ const App = () => {
               <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-500/20 blur-3xl"></div>
               
               <img 
-                src="public/event1.jpg" 
+                src="${baseURL}event1.jpg" 
                 alt="Kerala Boat Race" 
                 className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40"
               />
@@ -217,12 +217,12 @@ const App = () => {
                 <div className="lg:w-1/2 relative">
                   <div className="grid grid-cols-2 gap-4">
                     <img 
-                      src="public\kathakali.jpg" 
+                      src="${baseURL}kathakali.jpg" 
                       alt="Kathakali" 
                       className="rounded-2xl shadow-xl w-full h-64 object-cover transform translate-y-8" 
                     />
                     <img 
-                      src="public\Onam celebration.jpg" 
+                      src="${baseURL}Onam celebration.jpg" 
                       alt="Onam Sadhya" 
                       className="rounded-2xl shadow-xl w-full h-64 object-cover" 
                     />
@@ -349,7 +349,7 @@ const App = () => {
               {/* Odisha Side */}
               <div className="relative group overflow-hidden h-96 md:h-full bg-stone-900">
                 <img 
-                  src="/public/1-rajarani-temple-bhubaneshwar-odisha-2-state-hero.jpg" 
+                  src="${baseURL}1-rajarani-temple-bhubaneshwar-odisha-2-state-hero.jpg" 
                   alt="Odisha Konark Temple" 
                   className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   onError={(e) => {
