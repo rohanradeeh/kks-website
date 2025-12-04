@@ -91,13 +91,13 @@ const App = () => {
   ];
 
   return (
-    <div className="font-sans text-gray-800 bg-stone-50 selection:bg-amber-200 selection:text-amber-900">
+    <div className="font-sans text-gray-800 bg-stone-50 selection:bg-amber-200 selection:text-amber-900 w-full overflow-x-hidden">
       
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="container mx-auto px-6 flex justify-between items-center">
+        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white">
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white shrink-0">
               <img 
                 src="KeralaKalaSamitiLogo.jpg" 
                 alt="KKS Logo" 
@@ -380,15 +380,15 @@ const App = () => {
           <section id="events" className="relative py-20 overflow-hidden bg-green-100">
             <div className="absolute inset-0 z-0">
               <img 
-                src="https://images.unsplash.com/photo-1590053255146-5c68962d644d?q=80&w=2070&auto=format&fit=crop" 
+                src="green.jpg" 
                 alt="Background Pattern" 
-                className="w-full h-full object-cover opacity-10"
+                className="w-full h-full object-cover opacity-50"
               />
             </div>
-            <div className="container mx-auto px-4 relative z-10">
+            <div className="container mx-auto px-4 md:px-6 relative z-10">
               <div className="text-center max-w-3xl mx-auto mb-10">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Latest News & Updates</h2>
-                <p className="text-gray-600 mb-6">
+                <p className="text-white-600 mb-6">
                   Stay connected with our community. Check out the latest flyers, announcements, and posts directly from our Facebook page.
                 </p>
                 <a 
@@ -401,7 +401,7 @@ const App = () => {
                 </a>
               </div>
               <div className="flex justify-center items-center w-full">
-                <div className="w-full max-w-[500px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white transform transition-transform hover:scale-[1.01] duration-300">
+                <div className="w-full max-w-[400px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white transform transition-transform hover:scale-[1.01] duration-300">
                   <div className="bg-white p-4 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Facebook className="text-blue-600" size={24} />
@@ -411,8 +411,8 @@ const App = () => {
                   </div>
                   <div className="flex justify-center bg-gray-50">
                     <iframe 
-                      src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=500&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`} 
-                      width="500" 
+                      src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=400&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`}
+                      width="100%" 
                       height="800" 
                       style={{border:'none', overflow:'hidden', maxWidth: '100%'}} 
                       scrolling="no" 
@@ -424,19 +424,17 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <div className="text-center mt-8 text-sm text-gray-400 italic">
-                <p>* Feed updates automatically as we post on Facebook.</p>
+              <div className="text-center mt-8 text-sm text-white-400 italic">
+                <p> Feed updates automatically as we post on Facebook.</p>
               </div>
             </div>
           </section>
 
-          {/* -----------------------------------------------------------------
-              GALLERY PREVIEW SECTION (Visible on Home)
-          ------------------------------------------------------------------ */}
+          {/* Gallery Preview Section */}
           <section id="gallery" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
-              <div className="flex flex-col md:flex-row justify-between items-end mb-10">
-                <div>
+            <div className="container mx-auto px-4 md:px-6">
+              <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10">
+                <div className="text-center md:text-left mb-6 md:mb-0">
                   <h4 className="text-emerald-700 font-bold uppercase tracking-widest text-sm mb-2">Our Memories</h4>
                   <h2 className="text-3xl font-serif font-bold text-gray-900">Life at Kala Samiti</h2>
                 </div>
@@ -451,7 +449,6 @@ const App = () => {
                 </button>
               </div>
 
-              {/* Preview Grid (First 8 images) */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {fullGalleryImages.slice(0, 8).map((img, index) => (
                   <div key={img.id} className={`relative rounded-2xl overflow-hidden group shadow-md ${index === 0 ? 'col-span-2 row-span-2' : 'h-48'}`}>
@@ -465,7 +462,6 @@ const App = () => {
                 ))}
               </div>
 
-              {/* Mobile View All Button */}
               <div className="mt-8 text-center md:hidden">
                 <button 
                   onClick={() => {
