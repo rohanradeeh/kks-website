@@ -20,15 +20,12 @@ const App = () => {
   // ---------------------------------------------------------------------------
   // GALLERY CONFIGURATION
   // ---------------------------------------------------------------------------
-  // This generates paths for 50 images: /gallery/1.jpg, /gallery/2.jpg ... /gallery/50.jpg
-  // The user must place images in the 'public/gallery' folder named 1.jpg through 50.jpg
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
     src: `${baseUrl}gallery/${i + 1}.jpg`, 
     alt: `Gallery Image ${i + 1}`
   }));
 
-  // Handle scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -161,10 +158,7 @@ const App = () => {
         )}
       </nav>
 
-      {/* ----------------------------------------------------------------------
-          VIEW LOGIC: If currentView is 'home', show Landing Page.
-          If 'gallery', show Full Gallery Grid.
-      ----------------------------------------------------------------------- */}
+     
       {currentView === 'home' ? (
         <>
           {/* Hero Section */}
@@ -497,9 +491,7 @@ const App = () => {
           </section>
         </>
       ) : (
-        /* -----------------------------------------------------------------
-            FULL GALLERY PAGE (50 Images)
-           ------------------------------------------------------------------ */
+        
         <section className="min-h-screen bg-stone-50 pt-28 pb-20">
           <div className="container mx-auto px-6">
             <div className="flex items-center gap-4 mb-10">
