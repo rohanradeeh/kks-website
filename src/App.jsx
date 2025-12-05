@@ -386,11 +386,8 @@ const App = () => {
                   Stay connected with our community. Check out the latest flyers, announcements, and posts directly from our Facebook page.
                 </p>
                 <a 
-<<<<<<< Updated upstream
                   href="https://www.facebook.com/keralakalasamitibbsr/" 
-=======
-                  href="https://www.facebook.com/keralakalasamitibbsr/"
->>>>>>> Stashed changes
+
                   target="_blank" 
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-6 rounded-full transition-all"
