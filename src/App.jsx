@@ -136,8 +136,11 @@ const App = () => {
           </button>
         </div>
 
-        {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 py-4 flex flex-col items-center gap-4 animate-in slide-in-from-top-5 duration-200">
+        <div 
+          className={`lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col items-center gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? 'max-h-96 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
+          }`}
+        >
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
@@ -154,8 +157,7 @@ const App = () => {
             >
               Join Now
             </button>
-          </div>
-        )}
+        </div>
       </nav>
 
      
