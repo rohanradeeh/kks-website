@@ -1,31 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Calendar, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCallIcon } from 'lucide-react';
-const getAssetPath = (path) => {
-    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-    return `${import.meta.env.BASE_URL}${cleanPath}`;
-  };
+import { Menu, X, Calendar, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCall as PhoneCallIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [showMembershipModal, setShowMembershipModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null); // State for Lightbox
-  const [currentView, setCurrentView] = useState('home'); // 'home' or 'gallery'
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null); 
+  const [currentView, setCurrentView] = useState('home'); 
 
   // ---------------------------------------------------------------------------
   // CONFIGURATION
   // ---------------------------------------------------------------------------
   const facebookPageUrl = "https://www.facebook.com/keralakalasamitibbsr/"; 
   const encodedFbUrl = encodeURIComponent(facebookPageUrl);
-  const baseUrl="./"
+  
+  // Base URL for relative paths 
+  const baseUrl = "./";
+
   // ---------------------------------------------------------------------------
   // GALLERY CONFIGURATION
   // ---------------------------------------------------------------------------
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
-    src: `${baseUrl}gallery/${i + 1}.jpg`, 
-    alt: `Gallery Image ${i + 1}`
+    src: '${baseUrl}gallery/${i + 1}.jpg', 
+    alt: 'Gallery Image ${i + 1}'
   }));
 
+  // Handle scroll effect for navbar
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -34,36 +35,48 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Handle Keyboard Navigation for Slider
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (selectedImageIndex === null) return;
+      
+      if (e.key === 'ArrowRight') {
+        handleNextImage(e);
+      } else if (e.key === 'ArrowLeft') {
+        handlePrevImage(e);
+      } else if (e.key === 'Escape') {
+        setSelectedImageIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedImageIndex]);
+
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Function to handle navigation
   const handleNavigation = (e, href) => {
     e.preventDefault();
-    
-    // If clicking a link while in gallery mode, go back home first
     if (currentView === 'gallery') {
       setCurrentView('home');
-      // Wait for state update to scroll
       setTimeout(() => {
         const element = document.querySelector(href);
         if (element) {
-          const headerOffset = 0;
+          const headerOffset = 80;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.scrollY - headerOffset;
           window.scrollTo({ top: offsetPosition, behavior: "smooth" });
         }
       }, 100);
     } else {
-      // Normal smooth scroll
       const element = document.querySelector(href);
       if (element) {
-        const headerOffset = 0; 
+        const headerOffset = 80; 
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.scrollY - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
       }
     }
-    
     setIsMenuOpen(false);
   };
 
@@ -77,6 +90,17 @@ const App = () => {
     setShowMembershipModal(true);
   };
 
+  // Slider Navigation Handlers
+  const handleNextImage = (e) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev + 1) % fullGalleryImages.length);
+  };
+
+  const handlePrevImage = (e) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev - 1 + fullGalleryImages.length) % fullGalleryImages.length);
+  };
+
   const navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'About Us', href: '#about' },
@@ -88,15 +112,35 @@ const App = () => {
   ];
 
   return (
-    <div className="font-sans text-gray-800 bg-stone-50 selection:bg-amber-200 selection:text-amber-900 w-full overflow-x-hidden">
+    <div className="font-sans text-gray-800 bg-stone-50 selection:bg-amber-200 selection:text-amber-900 w-full max-w-[100vw] overflow-x-hidden min-h-screen flex flex-col">
       
+      {/* CUSTOM CSS ANIMATIONS (No external import needed) */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.95); opacity: 0; }
+          to { transform: scale(1); opacity: 1; }
+        }
+        /* Class for the Modal Background */
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-out forwards;
+        }
+        /* Class for the Image Switch */
+        .animate-scale-in {
+          animation: scaleIn 0.7s ease-out forwards;
+        }
+      `}</style>
+
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
+        <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
           <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white shrink-0">
               <img 
-                src="KeralaKalaSamitiLogo.jpg" 
+                src={'KeralaKalaSamitiLogo.jpg'} 
                 alt="KKS Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -107,12 +151,12 @@ const App = () => {
                 }}
               />
             </div>
-            <div className={`text-2xl font-serif font-bold tracking-tight ${scrolled ? 'text-emerald-900' : 'text-white'}`}>
-              KKS <span className="hidden sm:inline text-lg font-sans font-normal opacity-90">Bhubaneswar</span>
+            <div className={`text-lg md:text-2xl font-serif font-bold tracking-tight ${scrolled ? 'text-emerald-900' : 'text-white'}`}>
+              KKS <span className="hidden sm:inline font-sans font-normal opacity-90">Bhubaneswar</span>
             </div>
           </div>
 
-          <div className="hidden md:flex gap-8 items-center">
+          <div className="hidden lg:flex gap-8 items-center">
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
@@ -131,11 +175,12 @@ const App = () => {
             </button>
           </div>
 
-          <button onClick={toggleMenu} className={`md:hidden ${scrolled ? 'text-gray-800' : 'text-white'}`}>
+          <button onClick={toggleMenu} className={`lg:hidden ${scrolled ? 'text-gray-800' : 'text-white'} p-2`}>
             {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
         </div>
 
+        {/* Mobile Menu Dropdown with smooth transition */}
         <div 
           className={`lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col items-center gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
             isMenuOpen ? 'max-h-96 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
@@ -160,7 +205,7 @@ const App = () => {
         </div>
       </nav>
 
-     
+      {/* VIEW LOGIC */}
       {currentView === 'home' ? (
         <>
           {/* Hero Section */}
@@ -169,20 +214,19 @@ const App = () => {
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-900/90 to-emerald-800/80 z-10"></div>
               <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-amber-400/20 blur-3xl"></div>
               <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-teal-500/20 blur-3xl"></div>
-              
               <img 
-                src="event1.jpg" 
+                src={'event1.jpg'} 
                 alt="Kerala Boat Race" 
                 className="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-40"
               />
             </div>
 
-            <div className="container mx-auto px-6 relative z-20 text-center md:text-left">
+            <div className="container mx-auto px-4 md:px-6 relative z-20 text-center md:text-left">
               <div className="md:w-2/3 lg:w-1/2">
                 <span className="inline-block py-1 px-3 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/50 text-xs font-bold tracking-widest uppercase mb-6 backdrop-blur-sm">
                   Est. 1966
                 </span>
-                <h1 className="text-5xl md:text-7xl font-serif font-bold text-white leading-tight mb-6">
+                <h1 className="text-4xl md:text-5xl lg:text-7xl font-serif font-bold text-white leading-tight mb-6">
                   A Little Piece of <span className="text-amber-400 italic">Kerala</span> in Odisha
                 </h1>
                 <p className="text-lg md:text-xl text-stone-200 mb-8 leading-relaxed">
@@ -208,19 +252,19 @@ const App = () => {
 
           {/* About Section */}
           <section id="about" className="py-20 md:py-32 relative">
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto px-4 md:px-6">
               <div className="flex flex-col lg:flex-row gap-16 items-center">
                 <div className="lg:w-1/2 relative">
                   <div className="grid grid-cols-2 gap-4">
                     <img 
-                      src="kathakali.jpg" 
+                      src={'kathakali.jpg'} 
                       alt="Kathakali" 
-                      className="rounded-2xl shadow-xl w-full h-64 object-cover transform translate-y-8" 
+                      className="rounded-2xl shadow-xl w-full h-40 md:h-64 object-cover transform translate-y-8" 
                     />
                     <img 
-                      src="Onam celebration.jpg" 
+                      src={'Onam celebration.jpg'} 
                       alt="Onam Sadhya" 
-                      className="rounded-2xl shadow-xl w-full h-64 object-cover" 
+                      className="rounded-2xl shadow-xl w-full h-40 md:h-64 object-cover" 
                     />
                   </div>
                   <div className="absolute -z-10 top-0 left-0 w-full h-full bg-amber-100 rounded-full blur-3xl opacity-50 transform scale-150"></div>
@@ -228,7 +272,7 @@ const App = () => {
 
                 <div className="lg:w-1/2">
                   <h4 className="text-emerald-700 font-bold uppercase tracking-widest text-sm mb-2">About Our Society</h4>
-                  <h2 className="text-4xl font-serif font-bold text-gray-900 mb-6">Unity in Diversity, <br/> Rooted in Tradition.</h2>
+                  <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-6">Unity in Diversity, <br/> Rooted in Tradition.</h2>
                   <div className="space-y-6 text-gray-600 leading-relaxed">
                     <p>
                       To bring the Malayali families in Bhubaneswar closer, a few visionary members of the community established the <span className="font-semibold text-emerald-800">Kerala Kala Samiti in 1966</span>.
@@ -260,10 +304,10 @@ const App = () => {
 
           {/* Mission Section */}
           <section id="mission" className="py-20 bg-white">
-            <div className="container mx-auto px-6">
+            <div className="container mx-auto px-4 md:px-6">
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <h4 className="text-emerald-700 font-bold uppercase tracking-widest text-sm mb-2">Why We Exist</h4>
-                <h2 className="text-4xl font-serif font-bold text-gray-900 mb-4">Our Objectives</h2>
+                <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Our Objectives</h2>
                 <p className="text-gray-600">Guided by principles of dignity, integrity, and cultural pride, we strive to build a stronger community.</p>
               </div>
 
@@ -376,20 +420,19 @@ const App = () => {
           <section id="events" className="relative py-20 overflow-hidden bg-green-100">
             <div className="absolute inset-0 z-0">
               <img 
-                src="green.jpg" 
+                src="green.jpg"
                 alt="Background Pattern" 
-                className="w-full h-full object-cover opacity-50"
+                className="w-full h-full object-cover opacity-10"
               />
             </div>
             <div className="container mx-auto px-4 md:px-6 relative z-10">
               <div className="text-center max-w-3xl mx-auto mb-10">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Latest News & Updates</h2>
-                <p className="text-white-600 mb-6">
+                <p className="text-gray-600 mb-6">
                   Stay connected with our community. Check out the latest flyers, announcements, and posts directly from our Facebook page.
                 </p>
                 <a 
-                  href="https://www.facebook.com/keralakalasamitibbsr/" 
-
+                  href={`${facebookPageUrl}/events`} 
                   target="_blank" 
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-6 rounded-full transition-all"
@@ -398,7 +441,8 @@ const App = () => {
                 </a>
               </div>
               <div className="flex justify-center items-center w-full">
-                <div className="w-full max-w-[400px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white transform transition-transform hover:scale-[1.01] duration-300">
+                {/* FIX: Changed fixed width 500px to 375px max for force sizing */}
+                <div className="w-full max-w-[375px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white transform transition-transform hover:scale-[1.01] duration-300">
                   <div className="bg-white p-4 border-b border-gray-100 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Facebook className="text-blue-600" size={24} />
@@ -408,7 +452,8 @@ const App = () => {
                   </div>
                   <div className="flex justify-center bg-gray-50">
                     <iframe 
-                      src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=400&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`}
+                      // FIX: Changed width to 375 directly.
+                      src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=375&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`} 
                       width="100%" 
                       height="800" 
                       style={{border:'none', overflow:'hidden', maxWidth: '100%'}} 
@@ -421,17 +466,20 @@ const App = () => {
                   </div>
                 </div>
               </div>
-              <div className="text-center mt-8 text-sm text-white-400 italic">
-                <p> Feed updates automatically as we post on Facebook.</p>
+              <div className="text-center mt-8 text-sm text-gray-400 italic">
+                <p>* Feed updates automatically as we post on Facebook.</p>
               </div>
             </div>
           </section>
 
-          {/* Gallery Preview Section */}
+          {/* -----------------------------------------------------------------
+              GALLERY PREVIEW SECTION (Visible on Home)
+              FIX: 9 IMAGES (1 BIG + 8 SMALL) & 16:9 RATIO
+          ------------------------------------------------------------------ */}
           <section id="gallery" className="py-20 bg-white">
             <div className="container mx-auto px-4 md:px-6">
-              <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-10">
-                <div className="text-center md:text-left mb-6 md:mb-0">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
+                <div className="text-left mb-6 md:mb-0">
                   <h4 className="text-emerald-700 font-bold uppercase tracking-widest text-sm mb-2">Our Memories</h4>
                   <h2 className="text-3xl font-serif font-bold text-gray-900">Life at Kala Samiti</h2>
                 </div>
@@ -446,19 +494,30 @@ const App = () => {
                 </button>
               </div>
 
+              {/* Preview Grid (1 Big + 8 Small = 9 Images) */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {fullGalleryImages.slice(0, 8).map((img, index) => (
-                  <div key={img.id} className={`relative rounded-2xl overflow-hidden group shadow-md ${index === 0 ? 'col-span-2 row-span-2' : 'h-48'}`}>
+                {fullGalleryImages.slice(0, 9).map((img, index) => (
+                  <div 
+                    key={img.id} 
+                    // Use 'aspect-video' for 16:9 ratio
+                    className={`relative rounded-2xl overflow-hidden group shadow-md cursor-pointer
+                      ${index === 0 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1 aspect-video'}
+                    `}
+                    onClick={() => setSelectedImageIndex(index)}
+                  >
                     <img 
                       src={img.src} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                       alt={img.alt} 
                     />
-                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                       {index === 0 && <span className="text-white bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full text-sm border border-white/50">View Gallery</span>}
+                    </div>
                   </div>
                 ))}
               </div>
 
+              {/* Mobile View All Button */}
               <div className="mt-8 text-center md:hidden">
                 <button 
                   onClick={() => {
@@ -476,8 +535,8 @@ const App = () => {
           {/* Membership Banner */}
           <section id="membership" className="py-20 bg-emerald-900 text-white relative overflow-hidden">
             <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#fbbf24 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-            <div className="container mx-auto px-6 relative z-10 text-center">
-              <h2 className="text-4xl md:text-5xl font-serif font-bold mb-6">Become a part of our Family</h2>
+            <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
+              <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6">Become a part of our Family</h2>
               <p className="text-emerald-100 max-w-2xl mx-auto text-lg mb-10">
                 Connect with fellow Malayalis, participate in cultural events, and help us preserve our heritage for the next generation.
               </p>
@@ -494,9 +553,9 @@ const App = () => {
           </section>
         </>
       ) : (
-        
+        /* Full Gallery Page */
         <section className="min-h-screen bg-stone-50 pt-28 pb-20">
-          <div className="container mx-auto px-6">
+          <div className="container mx-auto px-4 md:px-6">
             <div className="flex items-center gap-4 mb-10">
               <button 
                 onClick={() => setCurrentView('home')}
@@ -511,11 +570,11 @@ const App = () => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {fullGalleryImages.map((img) => (
+              {fullGalleryImages.map((img, index) => (
                 <div 
                   key={img.id} 
                   className="relative aspect-square rounded-xl overflow-hidden group shadow-sm hover:shadow-xl transition-all cursor-pointer"
-                  onClick={() => setSelectedImage(img.src)}
+                  onClick={() => setSelectedImageIndex(index)}
                 >
                   <img 
                     src={img.src} 
@@ -547,13 +606,13 @@ const App = () => {
 
       {/* Footer */}
       <footer id="contact" className="bg-stone-900 text-stone-400 py-16">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-stone-800 pb-12">
             <div>
                <div className="flex items-center gap-2 mb-6">
                 <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white shrink-0">
                   <img 
-                    src="KeralaKalaSamitiLogo.jpg" 
+                    src="KeralaKalaSamitiLogo.jpg"  
                     alt="KKS Logo" 
                     className="w-full h-full object-cover"
                     onError={(e) => {
@@ -610,17 +669,17 @@ const App = () => {
                   <MapPin size={18} className="text-amber-500 mt-1 shrink-0" />
                   <span>
                     Kerala Kala Samiti Hall,<br />
-                    A/54, Baramunda,<br />
-                    Bhubaneswar Odisha - 751001
+                    Unit-4, Bhubaneswar,<br />
+                    Odisha - 751001
                   </span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <PhoneCallIcon size={18} className="text-amber-500 shrink-0" />
+                  <span>+91 98275 75106</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <Mail size={18} className="text-amber-500 shrink-0" />
                   <span>secretarykksbbsr@gmail.com</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <PhoneCallIcon size={18} className="text-amber-500 shrink-0" />
-                  <span> +91 98275 75106</span>
                 </li>
               </ul>
             </div>
@@ -635,7 +694,7 @@ const App = () => {
       {/* Membership Download Success Modal */}
       {showMembershipModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all scale-100">
+           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all scale-100 animate-fade-in">
              <button 
                onClick={() => setShowMembershipModal(false)}
                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
@@ -665,24 +724,51 @@ const App = () => {
         </div>
       )}
 
-      {/* Lightbox Modal for Gallery Images */}
-      {selectedImage && (
+      {/* Lightbox Modal Slider (Re-added with Smooth Animations) */}
+      {selectedImageIndex !== null && (
         <div 
-          className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
-          onClick={() => setSelectedImage(null)}
+          className="fixed inset-0 z-[110] flex items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in" 
+          onClick={() => setSelectedImageIndex(null)}
         >
+          {/* Close Button */}
           <button 
-            onClick={() => setSelectedImage(null)}
-            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2"
+            onClick={() => setSelectedImageIndex(null)}
+            className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2 z-[120]"
           >
             <X size={32} />
           </button>
-          <img 
-            src={selectedImage} 
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl" 
-            alt="Gallery Full View"
-            onClick={(e) => e.stopPropagation()} 
-          />
+
+          {/* Left Arrow */}
+          <button
+            onClick={handlePrevImage}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/30 hover:bg-black/50 rounded-full p-2 transition-all z-[120]"
+          >
+            <ChevronLeft size={40} />
+          </button>
+
+          {/* Image Container with Animation */}
+          <div 
+            className="relative max-h-[90vh] max-w-[90vw]" 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img 
+              key={selectedImageIndex} // Key triggers animation on change
+              src={fullGalleryImages[selectedImageIndex].src} 
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl animate-scale-in" // Using custom class defined in style tag
+              alt={fullGalleryImages[selectedImageIndex].alt}
+            />
+            <div className="absolute bottom-4 left-0 w-full text-center text-white/80 text-sm drop-shadow-md">
+              {selectedImageIndex + 1} / {fullGalleryImages.length}
+            </div>
+          </div>
+
+          {/* Right Arrow */}
+          <button
+            onClick={handleNextImage}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white bg-black/30 hover:bg-black/50 rounded-full p-2 transition-all z-[120]"
+          >
+            <ChevronRight size={40} />
+          </button>
         </div>
       )}
     </div>
