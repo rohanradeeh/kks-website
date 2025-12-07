@@ -35,6 +35,12 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const getNavbarBg = () => {
+    if (scrolled) return 'bg-white/95 backdrop-blur-sm shadow-md py-3';
+    if (currentView === 'gallery') return 'bg-emerald-900 py-5'; 
+    return 'bg-transparent py-5'; 
+  };
+  const isDarkText = scrolled;
   // Handle Keyboard Navigation for Slider
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -110,11 +116,11 @@ const App = () => {
     { name: 'Membership', href: '#membership' },
     { name: 'Contact', href: '#contact' },
   ];
-
+   const isNavbarSolid = scrolled || currentView === 'gallery';
   return (
     <div className="font-sans text-gray-800 bg-stone-50 selection:bg-amber-200 selection:text-amber-900 w-full max-w-[100vw] overflow-x-hidden min-h-screen flex flex-col">
       
-      {/* CUSTOM CSS ANIMATIONS (No external import needed) */}
+      {/* CUSTOM CSS ANIMATIONS  */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
@@ -135,52 +141,49 @@ const App = () => {
       `}</style>
 
       {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-sm shadow-md py-3' : 'bg-transparent py-5'}`}>
-        <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white shrink-0">
-              <img 
-                src={'KeralaKalaSamitiLogo.jpg'} 
-                alt="KKS Logo" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.onerror = null; 
-                  e.target.style.display = 'none';
-                  e.target.parentNode.classList.add('bg-emerald-700', 'flex', 'items-center', 'justify-center');
-                  e.target.parentNode.innerHTML = '<span class="text-amber-100 font-bold text-xl">K</span>';
-                }}
-              />
-            </div>
-            <div className={`text-lg md:text-2xl font-serif font-bold tracking-tight ${scrolled ? 'text-emerald-900' : 'text-white'}`}>
-              KKS <span className="hidden sm:inline font-sans font-normal opacity-90">Bhubaneswar</span>
-            </div>
-          </div>
-
-          <div className="hidden lg:flex gap-8 items-center">
-            {navLinks.map((link) => (
-              <a 
-                key={link.name} 
-                href={link.href}
-                onClick={(e) => handleNavigation(e, link.href)}
-                className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-amber-500 cursor-pointer whitespace-nowrap ${scrolled ? 'text-gray-700' : 'text-stone-100'}`}
-              >
-                {link.name}
-              </a>
-            ))}
-            <button 
-              onClick={(e) => handleNavigation(e, '#membership')}
-              className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full font-semibold text-sm transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
-            >
-              Join Now
-            </button>
-          </div>
-
-          <button onClick={toggleMenu} className={`lg:hidden ${scrolled ? 'text-gray-800' : 'text-white'} p-2`}>
-            {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${getNavbarBg()}`}>
+    <div className="container mx-auto px-4 md:px-8 flex justify-between items-center">
+      {/* Logo Section */}
+      <div className="flex items-center gap-3 cursor-pointer" onClick={(e) => handleNavigation(e, '#home')}>
+        <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-lg bg-white shrink-0">
+          <img 
+            src={`${baseUrl}KeralaKalaSamitiLogo.jpg`} 
+            alt="KKS Logo" 
+            className="w-full h-full object-cover"
+          />
         </div>
+        {/* Dynamic Text Color Applied Here */}
+        <div className={`text-lg md:text-2xl font-serif font-bold tracking-tight ${isDarkText ? 'text-emerald-900' : 'text-white'}`}>
+          KKS <span className="hidden sm:inline font-sans font-normal opacity-90">Bhubaneswar</span>
+        </div>
+      </div>
+      {/* Desktop Menu Links */}
+      <div className="hidden lg:flex gap-8 items-center">
+        {navLinks.map((link) => (
+          <a 
+            key={link.name} 
+            href={link.href}
+            onClick={(e) => handleNavigation(e, link.href)}
+            className={`text-sm font-medium tracking-wide uppercase transition-colors hover:text-amber-500 cursor-pointer whitespace-nowrap ${isDarkText ? 'text-gray-700' : 'text-stone-100'}`}
+          >
+            {link.name}
+          </a>
+        ))}
+        <button 
+          onClick={(e) => handleNavigation(e, '#membership')}
+          className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full font-semibold text-sm transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
+        >
+          Join Now
+        </button>
+      </div>
 
-        {/* Mobile Menu Dropdown with smooth transition */}
+      {/* Mobile Menu Button */}
+      <button onClick={toggleMenu} className={`lg:hidden ${isDarkText ? 'text-gray-800' : 'text-white'} p-2`}>
+        {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+      </button>
+    </div>
+
+        {/* Mobile Menu Dropdown */}
         <div 
           className={`lg:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col items-center gap-4 overflow-hidden transition-all duration-300 ease-in-out ${
             isMenuOpen ? 'max-h-96 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
@@ -196,10 +199,7 @@ const App = () => {
                 {link.name}
               </a>
             ))}
-            <button 
-              onClick={(e) => handleNavigation(e, '#membership')}
-              className="bg-emerald-700 text-white px-8 py-2 rounded-full mt-2 whitespace-nowrap"
-            >
+            <button onClick={toggleMenu} className={`lg:hidden ${isNavbarSolid ? 'text-green-800' : 'text-green'} p-2`}>
               Join Now
             </button>
         </div>
