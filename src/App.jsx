@@ -68,7 +68,7 @@ const App = () => {
       setTimeout(() => {
         const element = document.querySelector(href);
         if (element) {
-          const headerOffset = 0;
+          const headerOffset = 10;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.scrollY - headerOffset;
           window.scrollTo({ top: offsetPosition, behavior: "smooth" });
@@ -77,7 +77,7 @@ const App = () => {
     } else {
       const element = document.querySelector(href);
       if (element) {
-        const headerOffset = 0; 
+        const headerOffset = 10; 
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.scrollY - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
