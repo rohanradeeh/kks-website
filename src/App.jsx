@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Calendar, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCall as PhoneCallIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-
+import { Menu, X, Calendar, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCallIcon as PhoneCallIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+const getAssetPath = (path) => {
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    return}
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -13,17 +15,15 @@ const App = () => {
   // ---------------------------------------------------------------------------
   const facebookPageUrl = "https://www.facebook.com/keralakalasamitibbsr/"; 
   const encodedFbUrl = encodeURIComponent(facebookPageUrl);
-  
-  // Base URL for relative paths 
-  const baseUrl = "./";
+  const baseUrl="./"
 
   // ---------------------------------------------------------------------------
   // GALLERY CONFIGURATION
   // ---------------------------------------------------------------------------
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
-    src: '${baseUrl}gallery/${i + 1}.jpg', 
-    alt: 'Gallery Image ${i + 1}'
+    src: `${baseUrl}gallery/${i + 1}.jpg`, 
+    alt: `Gallery Image ${i + 1}`
   }));
 
   // Handle scroll effect for navbar
