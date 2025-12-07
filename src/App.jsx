@@ -68,7 +68,7 @@ const App = () => {
       setTimeout(() => {
         const element = document.querySelector(href);
         if (element) {
-          const headerOffset = 80;
+          const headerOffset = 0;
           const elementPosition = element.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.scrollY - headerOffset;
           window.scrollTo({ top: offsetPosition, behavior: "smooth" });
@@ -77,7 +77,7 @@ const App = () => {
     } else {
       const element = document.querySelector(href);
       if (element) {
-        const headerOffset = 80; 
+        const headerOffset = 0; 
         const elementPosition = element.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.scrollY - headerOffset;
         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
@@ -169,12 +169,6 @@ const App = () => {
             {link.name}
           </a>
         ))}
-        <button 
-          onClick={(e) => handleNavigation(e, '#membership')}
-          className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-full font-semibold text-sm transition-all shadow-lg hover:shadow-xl whitespace-nowrap"
-        >
-          Join Now
-        </button>
       </div>
 
       {/* Mobile Menu Button */}
@@ -199,9 +193,6 @@ const App = () => {
                 {link.name}
               </a>
             ))}
-            <button onClick={toggleMenu} className={`lg:hidden ${isNavbarSolid ? 'text-green-800' : 'text-green'} p-2`}>
-              Join Now
-            </button>
         </div>
       </nav>
 
