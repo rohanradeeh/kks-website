@@ -19,7 +19,7 @@ const navLinks = [
   { name: 'Contact', href: '#contact' },
 ];
 
-// --- ASTRONOMICAL & CALENDAR ENGINE (Panchang) ---
+// --- ASTRONOMICAL & CALENDAR ENGINE  ---
 class PanchangEngine {
   constructor() {
     this.deg2rad = Math.PI / 180;
@@ -71,7 +71,8 @@ class PanchangEngine {
   }
 
   getMalayalamDate(date) {
-    const jd = this.getJulianDay(date);
+    const noonDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+    const jd = this.getJulianDay(noonDate);
     const ayanamsa = this.getAyanamsa(jd);
     const sunLongTropical = this.getSunLongitude(jd);
     const sunLongSidereal = this.normalize(sunLongTropical - ayanamsa);
@@ -96,7 +97,8 @@ class PanchangEngine {
   }
 
   getPanchang(date) {
-    const jd = this.getJulianDay(date);
+    const sunriseDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 6, 0, 0);
+    const jd = this.getJulianDay(sunriseDate);
     const ayanamsa = this.getAyanamsa(jd);
     const sunLong = this.normalize(this.getSunLongitude(jd) - ayanamsa);
     const moonLong = this.normalize(this.getMoonLongitude(jd) - ayanamsa);
@@ -565,18 +567,14 @@ const App = () => {
             </div>
           </section>
 
-          {/* EVENTS & CALENDAR SECTION (Merged) */}
+          {/* EVENTS & CALENDAR SECTION */}
           <section id="events" className="relative py-20 overflow-hidden bg-green-100">
             <div className="container mx-auto px-4 md:px-6 relative z-10">
               <div className="text-center max-w-3xl mx-auto mb-16">
                 <h2 className="text-3xl md:text-4xl font-serif font-bold text-gray-900 mb-4">Latest News & Events</h2>
                 <p className="text-gray-600">Stay updated with our latest social media posts and upcoming cultural dates.</p>
               </div>
-
-              {/* MODIFIED GRID: CALENDAR TAKES MORE SPACE */}
-              <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
-                
-                {/* LEFT: Facebook Feed (Fixed 375px Max) */}
+              <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">          
                 <div className="flex flex-col items-center w-full">
                   <h3 className="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
                     <Facebook className="text-blue-600" /> Community Feed
@@ -594,8 +592,6 @@ const App = () => {
                     ></iframe>
                   </div>
                 </div>
-
-                {/* RIGHT: New Malayalam Calendar (Expands to fill) */}
                 <div className="flex flex-col items-center w-full h-full">
                   <h3 className="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
                     <CalendarIcon className="text-amber-500" /> Malayalam Calendar
@@ -632,18 +628,15 @@ const App = () => {
                                   <span className={`text-sm font-bold ${today ? 'text-emerald-700' : 'text-slate-700'}`}>{data.date.getDate()}</span>
                                   {data.panchang && (
                                     <div className="flex flex-col items-end">
-                                      {/* NEW: Malayalam Month and Day */}
                                       <span className="text-[9px] font-bold text-emerald-600 leading-tight">
                                         {data.panchang.solar.month.en.substring(0,3)} {data.panchang.solar.day}
                                       </span>
-                                      {/* NEW: Nakshatra (Star) Name */}
                                       <span className="text-[8px] text-gray-400 leading-tight hidden sm:block">
                                         {data.panchang.nakshatraName.en}
                                       </span>
                                     </div>
                                   )}
                                 </div>
-                                {/* NEW: Event Name Text directly in cell */}
                                 <div className="mt-1">
                                   {firstEvent && (
                                     <div className={`text-[9px] sm:text-[10px] font-bold truncate leading-tight rounded px-1 py-0.5 ${hasMajor ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}`}>
@@ -725,7 +718,6 @@ const App = () => {
 
       {/* Footer */}
       <footer id="contact" className="bg-stone-900 text-stone-400 py-16">
-         {/* ... (Footer code remains same) ... */}
          <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-stone-800 pb-12">
             <div>
