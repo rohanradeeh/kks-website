@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 // eslint-disable-next-line no-unused-vars -- `motion` is used via JSX member expressions (<motion.div>), which this config's plain no-unused-vars doesn't detect
-import { motion, MotionConfig } from 'framer-motion';
+import { motion, MotionConfig, useScroll, useTransform } from 'framer-motion';
 import { Menu, X, Calendar as CalendarIcon, MapPin, Users, Mail, Facebook, Instagram, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCall as PhoneCallIcon, ChevronLeft, ChevronRight, Moon, Star, Info } from 'lucide-react';
 import { ZariProgress } from './motifs/ZariProgress.jsx';
 import { HouseboatCrossing } from './motifs/HouseboatCrossing.jsx';
@@ -162,14 +162,37 @@ export class PanchangEngine {
 const engine = new PanchangEngine();
 
 // --- SHARED: quiet, single-purpose scroll reveal (opacity only, once) ---
-const Reveal = ({ children, className = '', delay = 0 }) => (
+const EASE = [0.16, 1, 0.3, 1];
+
+const Reveal = ({ children, className = '', delay = 0, y = 22 }) => (
   <motion.div
     className={className}
-    initial={{ opacity: 0 }}
-    whileInView={{ opacity: 1 }}
+    initial={{ opacity: 0, y }}
+    whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.2 }}
-    transition={{ duration: 0.7, delay, ease: 'easeOut' }}
+    transition={{ duration: 0.8, delay, ease: EASE }}
   >
+    {children}
+  </motion.div>
+);
+
+// Staggered reveal for grids/lists: wrap the group with <Stagger>, each
+// child with <StaggerItem>.
+const staggerContainerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+};
+const staggerItemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
+};
+const Stagger = ({ children, className = '' }) => (
+  <motion.div className={className} variants={staggerContainerVariants} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}>
+    {children}
+  </motion.div>
+);
+const StaggerItem = ({ children, className = '', ...rest }) => (
+  <motion.div className={className} variants={staggerItemVariants} {...rest}>
     {children}
   </motion.div>
 );
@@ -262,6 +285,9 @@ const App = () => {
   const [selectedDay, setSelectedDay] = useState(null);
   const [fbFeedVisible, setFbFeedVisible] = useState(() => typeof IntersectionObserver === 'undefined');
   const fbFeedRef = useRef(null);
+  const heroRef = useRef(null);
+  const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroImageY = useTransform(heroScroll, [0, 1], ['0%', '22%']);
 
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
@@ -399,24 +425,21 @@ const App = () => {
     if (typeof window.history.pushState === 'function') {
       window.history.pushState(null, '', href);
     }
+    // scroll-mt-28 on each section handles the fixed-nav offset, so a plain
+    // scrollIntoView lands correctly whether the nav is in its tall
+    // (unscrolled) or short (scrolled) state.
     if (currentView === 'gallery') {
       setCurrentView('home');
       setTimeout(() => {
         const element = document.querySelector(href);
         if (element) {
-          const headerOffset = 15;
-          const elementPosition = element.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.scrollY - headerOffset;
-          window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 100);
     } else {
       const element = document.querySelector(href);
       if (element) {
-        const headerOffset = 15;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.scrollY - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
     setIsMenuOpen(false);
@@ -490,43 +513,65 @@ const App = () => {
       {currentView === 'home' ? (
         <>
           {/* Hero Section */}
-          <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden">
+          <section id="home" className="relative min-h-screen flex items-center pt-20 overflow-hidden" ref={heroRef}>
             <div className="absolute inset-0 z-0 bg-ink">
-              <img src={`agm.jpg`} alt="Kerala Boat Race" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <motion.img src={`agm.jpg`} alt="Kerala Boat Race" style={{ y: heroImageY }} className="absolute inset-0 w-full h-full object-cover opacity-50 scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/30"></div>
               <div className="absolute inset-0 bg-gradient-to-r from-ink/60 via-transparent to-backwater/30"></div>
             </div>
             <div className="container mx-auto px-4 md:px-6 relative z-20 text-center md:text-left">
-              <div className="md:w-2/3 lg:w-1/2 mx-auto md:mx-0">
-                <span className="inline-block py-1.5 px-4 rounded-full border border-gold/50 text-gold-light text-xs font-medium tracking-wide mb-7 backdrop-blur-sm">Est. 1966</span>
+              <motion.div
+                className="md:w-2/3 lg:w-1/2 mx-auto md:mx-0"
+                variants={staggerContainerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                <motion.span variants={staggerItemVariants} className="inline-block py-1.5 px-4 rounded-full border border-gold/50 text-gold-light text-xs font-medium tracking-wide mb-7 backdrop-blur-sm">Est. 1966</motion.span>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-extrabold text-ivory leading-[1.08] mb-6 tracking-tight">
-                  A little piece of Kerala<br className="hidden md:block" /> in the heart of Odisha
+                  <motion.span variants={staggerItemVariants} className="block">A little piece of Kerala</motion.span>
+                  <motion.span variants={staggerItemVariants} className="block">in the heart of Odisha</motion.span>
                 </h1>
-                <p className="text-lg md:text-xl text-ivory/75 mb-10 leading-relaxed max-w-lg mx-auto md:mx-0">
+                <motion.p variants={staggerItemVariants} className="text-lg md:text-xl text-ivory/75 mb-10 leading-relaxed max-w-lg mx-auto md:mx-0">
                   The foremost Malayali cultural and social organization in Bhubaneswar — preserving our heritage and fostering cultural integration since 1966.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                </motion.p>
+                <motion.div variants={staggerItemVariants} className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                   <button onClick={handleMembershipClick} className="bg-gold hover:bg-gold-dark text-ink px-8 py-4 rounded-full font-display font-bold text-base transition-colors">
                     Become a member
                   </button>
                   <button onClick={(e) => handleNavigation(e, '#events')} className="text-ivory border border-ivory/30 hover:border-ivory/60 px-8 py-4 rounded-full font-display font-semibold text-base transition-colors">
                     Explore events
                   </button>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </section>
 
           {/* About Section */}
-          <section id="about" className="py-24 md:py-36 relative overflow-hidden">
+          <section id="about" className="py-24 md:py-36 relative overflow-hidden scroll-mt-28">
             <MuralLineArt className="hidden lg:block absolute top-10 right-8 w-28 h-36 opacity-70" />
             <div className="container mx-auto px-4 md:px-6">
               <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
                 <div className="lg:w-1/2 relative w-full">
                   <div className="absolute -top-4 -left-4 w-full h-full border border-gold/40 rounded-2xl hidden sm:block" aria-hidden="true"></div>
                   <div className="grid grid-cols-2 gap-4 relative">
-                    <img src={`kathakali.jpg`} alt="Kathakali" className="rounded-2xl shadow-lg w-full h-40 md:h-64 object-cover transform translate-y-8" loading="lazy" />
-                    <img src={`onam sadya.jpg`} alt="Onam Sadhya" className="rounded-2xl shadow-lg w-full h-40 md:h-64 object-cover" loading="lazy" />
+                    <motion.img
+                      src={`kathakali.jpg`} alt="Kathakali"
+                      className="rounded-2xl shadow-lg w-full h-40 md:h-64 object-cover"
+                      loading="lazy"
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 32, scale: 1 }}
+                      viewport={{ once: true, amount: 0.4 }}
+                      transition={{ duration: 0.9, ease: EASE }}
+                    />
+                    <motion.img
+                      src={`onam sadya.jpg`} alt="Onam Sadhya"
+                      className="rounded-2xl shadow-lg w-full h-40 md:h-64 object-cover"
+                      loading="lazy"
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                      viewport={{ once: true, amount: 0.4 }}
+                      transition={{ duration: 0.9, delay: 0.15, ease: EASE }}
+                    />
                   </div>
                 </div>
                 <Reveal className="lg:w-1/2">
@@ -542,14 +587,14 @@ const App = () => {
           </section>
 
           {/* Mission Section */}
-          <section id="mission" className="py-24 bg-ink text-ivory">
+          <section id="mission" className="py-24 bg-ink text-ivory scroll-mt-28">
             <div className="container mx-auto px-4 md:px-6">
                <Reveal className="max-w-2xl mb-16">
                 <p className="font-accent italic text-xl text-gold-light mb-3">Why we exist</p>
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What guides us</h2>
                 <p className="text-ivory/60">Guided by principles of dignity, integrity, and cultural pride, we strive to build a stronger community.</p>
                </Reveal>
-               <div className="grid md:grid-cols-2 md:gap-x-16 border-t border-ivory/10">
+               <Stagger className="grid md:grid-cols-2 md:gap-x-16 border-t border-ivory/10">
                  {[
                     { icon: HandHeart, title: "Dignity & welfare", desc: "To promote India's dignity and integrity in terms of social life. We focus on social welfare initiatives that uplift our members and the surrounding community." },
                     { icon: Landmark, title: "Cultural integration", desc: "To link the rich culture of Kerala with the great culture of Odisha. We facilitate a cultural exchange that honors both traditions." },
@@ -558,39 +603,55 @@ const App = () => {
                     { icon: Sprout, title: "Future generations", desc: "To connect with the next generation, transmitting Kerala's rich culture and heritage through Malayalam classes and youth activities." },
                     { icon: CalendarIcon, title: "Regular activities", desc: "To organize cultural programs, picnics, medical camps, and sports, and to celebrate major festivals that foster friendship and goodwill." },
                  ].map((item, i) => (
-                   <div key={item.title} className={`flex gap-5 py-8 border-b border-ivory/10 ${i % 2 === 0 ? 'md:pr-10' : 'md:pl-10'}`}>
+                   <StaggerItem key={item.title} className={`flex gap-5 py-8 border-b border-ivory/10 ${i % 2 === 0 ? 'md:pr-10' : 'md:pl-10'}`}>
                       <item.icon size={22} className="text-gold-light shrink-0 mt-1" />
                       <div>
                         <h3 className="text-lg font-display font-semibold text-ivory mb-2">{item.title}</h3>
                         <p className="text-ivory/55 text-sm leading-relaxed">{item.desc}</p>
                       </div>
-                   </div>
+                   </StaggerItem>
                  ))}
-               </div>
+               </Stagger>
             </div>
           </section>
 
           {/* Cultural Link Section */}
           <section className="relative bg-backwater py-0">
             <div className="grid md:grid-cols-2 h-auto md:h-[600px] relative">
-              <div className="relative group overflow-hidden h-96 md:h-full">
+              <motion.div
+                className="relative group overflow-hidden h-96 md:h-full"
+                initial={{ opacity: 0, x: -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.9, ease: EASE }}
+              >
                 <img src="kerala-backwaters.jpg" alt="Kerala Backwaters" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" loading="lazy" />
                 <div className="absolute inset-0 bg-ink/40 group-hover:bg-ink/25 transition-colors flex flex-col justify-center items-center text-center p-8">
                   <h3 className="text-4xl md:text-5xl font-display font-bold text-ivory mb-2 tracking-wide">Kerala</h3>
                   <p className="text-gold-light font-medium uppercase tracking-widest text-sm">God's Own Country</p>
                 </div>
-              </div>
-              <div className="relative group overflow-hidden h-96 md:h-full bg-ink">
+              </motion.div>
+              <motion.div
+                className="relative group overflow-hidden h-96 md:h-full bg-ink"
+                initial={{ opacity: 0, x: 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.9, ease: EASE }}
+              >
                 <img src="1-rajarani-temple-bhubaneshwar-odisha-2-state-hero.jpg" alt="Odisha Konark Temple" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" onError={(e) => { if (e.target.src !== "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Konark_Sun_Temple_-_Odisha.jpg/800px-Konark_Sun_Temple_-_Odisha.jpg") { e.target.src = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Konark_Sun_Temple_-_Odisha.jpg/800px-Konark_Sun_Temple_-_Odisha.jpg"; } }} />
                 <div className="absolute inset-0 bg-ink/40 group-hover:bg-ink/25 transition-colors flex flex-col justify-center items-center text-center p-8">
                   <h3 className="text-4xl md:text-5xl font-display font-bold text-ivory mb-2 tracking-wide">Odisha</h3>
                   <p className="text-gold-light font-medium uppercase tracking-widest text-sm">The Soul of India</p>
                 </div>
-              </div>
+              </motion.div>
 
-              <HouseboatCrossing />
-
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 w-32 h-32 md:w-44 md:h-44 bg-ivory/10 backdrop-blur-md rounded-full border border-gold/50 flex items-center justify-center p-4 text-center shadow-2xl">
+              <motion.div
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-40 w-32 h-32 md:w-44 md:h-44 bg-ivory/10 backdrop-blur-md rounded-full border border-gold/50 flex items-center justify-center p-4 text-center shadow-2xl"
+                initial={{ opacity: 0, scale: 0.7 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.5 }}
+                transition={{ duration: 0.6, delay: 0.5, ease: EASE }}
+              >
                 <div className="bg-ink rounded-full w-full h-full flex items-center justify-center border border-gold/60">
                   <div className="text-ivory">
                     <p className="text-xs uppercase font-semibold text-gold-light mb-1 tracking-widest">Bridging</p>
@@ -598,12 +659,12 @@ const App = () => {
                     <p className="text-xs uppercase font-semibold text-gold-light mt-1 tracking-widest">Cultures</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </section>
 
           {/* EVENTS & CALENDAR SECTION */}
-          <section id="events" className="relative py-24 overflow-hidden bg-cream border-y border-gold/15">
+          <section id="events" className="relative py-24 overflow-hidden bg-cream border-y border-gold/15 scroll-mt-28">
             <div className="container mx-auto px-4 md:px-6 relative z-10">
               <Reveal className="max-w-2xl mb-16">
                 <p className="font-accent italic text-xl text-gold-dark mb-3">What's happening</p>
@@ -707,7 +768,7 @@ const App = () => {
           </section>
 
           {/* Gallery Preview Section */}
-          <section id="gallery" className="py-24 bg-cream">
+          <section id="gallery" className="py-24 bg-cream scroll-mt-28">
             <div className="container mx-auto px-4 md:px-6">
                <Reveal className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
                  <div className="text-left mb-6 md:mb-0">
@@ -716,9 +777,9 @@ const App = () => {
                  </div>
                  <button onClick={() => { setCurrentView('gallery'); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="hidden md:flex items-center gap-2 px-6 py-2.5 border border-ink/20 hover:border-gold rounded-full text-sm font-medium transition-colors"><ImageIcon size={16} /> View all photos</button>
                </Reveal>
-               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+               <Stagger className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {fullGalleryImages.slice(0, 9).map((img, index) => (
-                    <div
+                    <StaggerItem
                       key={img.id}
                       className={`relative rounded-2xl overflow-hidden group shadow-sm cursor-pointer ${index === 0 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1 aspect-video'}`}
                       onClick={() => setSelectedImageIndex(index)}
@@ -728,9 +789,9 @@ const App = () => {
                       onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedImageIndex(index); } }}
                     >
                       <img src={img.src} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={img.alt} loading={index === 0 ? undefined : 'lazy'} />
-                    </div>
+                    </StaggerItem>
                   ))}
-               </div>
+               </Stagger>
                <div className="mt-8 text-center md:hidden">
                  <button onClick={() => { setCurrentView('gallery'); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="bg-ink text-ivory px-8 py-3 rounded-full font-semibold">View all photos</button>
                </div>
@@ -738,8 +799,9 @@ const App = () => {
           </section>
 
           {/* Membership Banner */}
-          <section id="membership" className="py-24 bg-backwater text-ivory relative overflow-hidden">
+          <section id="membership" className="py-24 bg-backwater text-ivory relative overflow-hidden scroll-mt-28">
              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(#C89A42 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
+             <HouseboatCrossing />
              <Reveal className="container mx-auto px-4 md:px-6 relative z-10 text-center">
                <h2 className="text-3xl md:text-5xl font-display font-bold mb-8">Become a part of our family</h2>
                <button onClick={handleMembershipClick} className="bg-gold hover:bg-gold-dark text-ink px-8 py-3.5 rounded-full font-display font-bold inline-flex items-center gap-2 transition-colors"><FileDown size={20} /> Apply for membership</button>
@@ -774,7 +836,7 @@ const App = () => {
       )}
 
       {/* Footer */}
-      <footer id="contact" className="bg-ink text-ivory/60 py-16">
+      <footer id="contact" className="bg-ink text-ivory/60 py-16 scroll-mt-28">
          <div className="container mx-auto px-4 md:px-6">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-ivory/10 pb-12">
             <div>
