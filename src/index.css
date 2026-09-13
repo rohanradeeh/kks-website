@@ -1,1 +1,41 @@
 @import "tailwindcss";
+
+@theme {
+  --color-cream: #F8F3E7;
+  --color-ink: #0E211B;
+  --color-backwater: #0F4A40;
+  --color-backwater-light: #155F52;
+  --color-gold: #A97A1F;
+  --color-gold-light: #C89A42;
+  --color-gold-dark: #7E5A14;
+  --color-laterite: #8B3423;
+  --color-ivory: #F6F1E4;
+
+  --font-display: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-accent: "Cormorant Garamond", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.flame-flicker {
+  animation: flameFlicker 2.4s ease-in-out infinite;
+  transform-origin: 50% 100%;
+}
+@keyframes flameFlicker {
+  0%, 100% { transform: scaleY(1) scaleX(1); opacity: 0.9; }
+  25% { transform: scaleY(1.08) scaleX(0.96); opacity: 1; }
+  50% { transform: scaleY(0.94) scaleX(1.04); opacity: 0.85; }
+  75% { transform: scaleY(1.05) scaleX(0.98); opacity: 0.95; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flame-flicker { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
