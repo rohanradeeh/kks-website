@@ -866,9 +866,25 @@ const App = () => {
             <div>
               <h3 className="text-ivory font-display font-semibold mb-6">Contact us</h3>
               <ul className="space-y-4 text-sm">
-                <li className="flex items-start gap-3"><MapPin size={18} className="text-gold-light mt-1 shrink-0" /><span>Kerala Kala Samiti Hall,<br />Unit-4, Bhubaneswar,<br />Odisha - 751001</span></li>
-                <li className="flex items-center gap-3"><PhoneCallIcon size={18} className="text-gold-light shrink-0" /><span>+91 98275 75106</span></li>
-                <li className="flex items-center gap-3"><Mail size={18} className="text-gold-light shrink-0" /><span>secretarykksbbsr@gmail.com</span></li>
+                <li className="flex items-start gap-3">
+                  <MapPin size={18} className="text-gold-light mt-1 shrink-0" />
+                  <a
+                    href="https://maps.google.com/?q=Kerala+Kala+Samiti+Hall,+Unit-4,+Bhubaneswar,+Odisha+751001"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-gold-light transition-colors"
+                  >
+                    Kerala Kala Samiti Hall,<br />Unit-4, Bhubaneswar,<br />Odisha - 751001
+                  </a>
+                </li>
+                <li className="flex items-center gap-3">
+                  <PhoneCallIcon size={18} className="text-gold-light shrink-0" />
+                  <a href="tel:+919827575106" className="hover:text-gold-light transition-colors">+91 98275 75106</a>
+                </li>
+                <li className="flex items-center gap-3">
+                  <Mail size={18} className="text-gold-light shrink-0" />
+                  <a href="mailto:secretarykksbbsr@gmail.com" className="hover:text-gold-light transition-colors">secretarykksbbsr@gmail.com</a>
+                </li>
               </ul>
             </div>
           </div>
