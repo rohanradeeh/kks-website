@@ -695,12 +695,9 @@ const App = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-center w-full h-full">
-                  <h3 className="text-xl font-display font-semibold text-ink mb-2 flex items-center gap-2 self-start">
+                  <h3 className="text-xl font-display font-semibold text-ink mb-6 flex items-center gap-2 self-start">
                     <CalendarIcon size={20} className="text-gold-dark" /> Malayalam calendar
                   </h3>
-                  <p className="text-xs text-ink/45 mb-4 flex items-center gap-1.5 self-start text-left">
-                    <Info size={14} className="shrink-0" /> Dates and festival days are approximate (calculated locally) — please confirm important dates with an authoritative Panchangam.
-                  </p>
                   <div className="w-full bg-white border border-gold/15 shadow-sm rounded-3xl overflow-hidden h-full flex flex-col">
                     <div className="bg-backwater text-ivory p-6 flex justify-between items-center">
                       <button onClick={() => changeMonth(-1)} className="p-2 hover:bg-backwater-light rounded-full transition-colors" aria-label="Previous month"><ChevronLeft /></button>
@@ -710,6 +707,9 @@ const App = () => {
                       </div>
                       <button onClick={() => changeMonth(1)} className="p-2 hover:bg-backwater-light rounded-full transition-colors" aria-label="Next month"><ChevronRight /></button>
                     </div>
+                    <p className="text-xs text-ink/50 flex items-center gap-1.5 px-4 py-2 bg-gold/10 border-b border-gold/15">
+                      <Info size={13} className="shrink-0" /> Dates and festival days are approximate (calculated locally) — please confirm important dates with an authoritative Panchangam.
+                    </p>
                     <div className="p-4 bg-cream flex-grow">
                        <div className="grid grid-cols-7 mb-2 text-center text-xs font-semibold text-backwater uppercase tracking-widest">
                           {WEEKDAYS.map(d => <div key={d}>{d}</div>)}
