@@ -164,13 +164,14 @@ const engine = new PanchangEngine();
 // --- SHARED: quiet, single-purpose scroll reveal (opacity only, once) ---
 const EASE = [0.16, 1, 0.3, 1];
 
-const Reveal = ({ children, className = '', delay = 0, y = 22 }) => (
+const Reveal = ({ children, className = '', delay = 0, y = 22, ...rest }) => (
   <motion.div
     className={className}
     initial={{ opacity: 0, y }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.2 }}
     transition={{ duration: 0.8, delay, ease: EASE }}
+    {...rest}
   >
     {children}
   </motion.div>
@@ -547,9 +548,9 @@ const App = () => {
           </section>
 
           {/* About Section */}
-          <section id="about" className="py-24 md:py-36 relative overflow-hidden scroll-mt-28">
+          <section className="py-24 md:py-36 relative overflow-hidden">
             <MuralLineArt className="hidden lg:block absolute top-10 right-8 w-28 h-36 opacity-70" />
-            <div className="container mx-auto px-4 md:px-6">
+            <div id="about" className="container mx-auto px-4 md:px-6 scroll-mt-28">
               <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
                 <div className="lg:w-1/2 relative w-full">
                   <div className="absolute -top-4 -left-4 w-full h-full border border-gold/40 rounded-2xl hidden sm:block" aria-hidden="true"></div>
@@ -587,8 +588,8 @@ const App = () => {
           </section>
 
           {/* Mission Section */}
-          <section id="mission" className="py-24 bg-ink text-ivory scroll-mt-28">
-            <div className="container mx-auto px-4 md:px-6">
+          <section className="py-24 bg-ink text-ivory">
+            <div id="mission" className="container mx-auto px-4 md:px-6 scroll-mt-28">
                <Reveal className="max-w-2xl mb-16">
                 <p className="font-accent italic text-xl text-gold-light mb-3">Why we exist</p>
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What guides us</h2>
@@ -664,8 +665,8 @@ const App = () => {
           </section>
 
           {/* EVENTS & CALENDAR SECTION */}
-          <section id="events" className="relative py-24 overflow-hidden bg-cream border-y border-gold/15 scroll-mt-28">
-            <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <section className="relative py-24 overflow-hidden bg-cream border-y border-gold/15">
+            <div id="events" className="container mx-auto px-4 md:px-6 relative z-10 scroll-mt-28">
               <Reveal className="max-w-2xl mb-16">
                 <p className="font-accent italic text-xl text-gold-dark mb-3">What's happening</p>
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-ink">Latest news &amp; events</h2>
@@ -768,8 +769,8 @@ const App = () => {
           </section>
 
           {/* Gallery Preview Section */}
-          <section id="gallery" className="py-24 bg-cream scroll-mt-28">
-            <div className="container mx-auto px-4 md:px-6">
+          <section className="py-24 bg-cream">
+            <div id="gallery" className="container mx-auto px-4 md:px-6 scroll-mt-28">
                <Reveal className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
                  <div className="text-left mb-6 md:mb-0">
                   <p className="font-accent italic text-xl text-gold-dark mb-3">Our memories</p>
@@ -799,10 +800,10 @@ const App = () => {
           </section>
 
           {/* Membership Banner */}
-          <section id="membership" className="py-24 bg-backwater text-ivory relative overflow-hidden scroll-mt-28">
+          <section className="py-24 bg-backwater text-ivory relative overflow-hidden">
              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(#C89A42 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
              <HouseboatCrossing />
-             <Reveal className="container mx-auto px-4 md:px-6 relative z-10 text-center">
+             <Reveal id="membership" className="container mx-auto px-4 md:px-6 relative z-10 text-center scroll-mt-28">
                <h2 className="text-3xl md:text-5xl font-display font-bold mb-8">Become a part of our family</h2>
                <button onClick={handleMembershipClick} className="bg-gold hover:bg-gold-dark text-ink px-8 py-3.5 rounded-full font-display font-bold inline-flex items-center gap-2 transition-colors"><FileDown size={20} /> Apply for membership</button>
              </Reveal>
@@ -836,8 +837,8 @@ const App = () => {
       )}
 
       {/* Footer */}
-      <footer id="contact" className="bg-ink text-ivory/60 py-16 scroll-mt-28">
-         <div className="container mx-auto px-4 md:px-6">
+      <footer className="bg-ink text-ivory/60 py-16">
+         <div id="contact" className="container mx-auto px-4 md:px-6 scroll-mt-28">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-ivory/10 pb-12">
             <div>
                <div className="flex items-center gap-3 mb-6">
