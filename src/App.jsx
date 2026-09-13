@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Menu, X, Calendar as CalendarIcon, MapPin, Users, Heart, ArrowRight, Mail, Phone, Facebook, Instagram, Twitter, ExternalLink, Image as ImageIcon, Scale, HandHeart, Sprout, Landmark, FileDown, CheckCircle, ArrowLeft, PhoneCall as PhoneCallIcon, ChevronLeft, ChevronRight, Moon, Star, Sun, Info } from 'lucide-react';
 
 // --- CONFIGURATION ---
@@ -20,7 +20,7 @@ const navLinks = [
 ];
 
 // --- ASTRONOMICAL & CALENDAR ENGINE  ---
-class PanchangEngine {
+export class PanchangEngine {
   constructor() {
     this.deg2rad = Math.PI / 180;
     this.rad2deg = 180 / Math.PI;
@@ -107,8 +107,7 @@ class PanchangEngine {
     const tithiIndex = Math.floor(tithiVal);
     const nakshatraIndex = Math.floor(nakshatraVal);
     const solarData = this.getMalayalamDate(date);
-    const lunarMonthIdx = this.getLunarMonthIndex(solarData.signIndex, tithiIndex);
-    
+
     return {
       tithiIndex, 
       tithiName: this.getTithiName(tithiIndex),
@@ -159,16 +158,27 @@ const engine = new PanchangEngine();
 
 // --- CALENDAR HELPER COMPONENTS ---
 const CalendarModal = ({ isOpen, onClose, data }) => {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen || !data) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in"
       onClick={onClose}
+      role="presentation"
     >
-      <div 
+      <div
         className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative border border-slate-200 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Calendar day details"
       >
         <div className="h-40 bg-gradient-to-br from-emerald-600 to-teal-700 relative p-6 flex flex-col justify-end overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
@@ -232,6 +242,8 @@ const App = () => {
   const [currentView, setCurrentView] = useState('home'); 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState(null);
+  const [fbFeedVisible, setFbFeedVisible] = useState(() => typeof IntersectionObserver === 'undefined');
+  const fbFeedRef = useRef(null);
 
   const fullGalleryImages = Array.from({ length: 50 }, (_, i) => ({
     id: i,
@@ -246,7 +258,30 @@ const App = () => {
   }, []);
 
   useEffect(() => {
+    const node = fbFeedRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setFbFeedVisible(true);
+        observer.disconnect();
+      }
+    }, { rootMargin: '200px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  const handleNextImage = useCallback((e) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev + 1) % fullGalleryImages.length);
+  }, [fullGalleryImages.length]);
+  const handlePrevImage = useCallback((e) => {
+    if (e) e.stopPropagation();
+    setSelectedImageIndex((prev) => (prev - 1 + fullGalleryImages.length) % fullGalleryImages.length);
+  }, [fullGalleryImages.length]);
+
+  useEffect(() => {
     const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && showMembershipModal) { setShowMembershipModal(false); return; }
       if (selectedImageIndex === null) return;
       if (e.key === 'ArrowRight') handleNextImage(e);
       else if (e.key === 'ArrowLeft') handlePrevImage(e);
@@ -254,7 +289,7 @@ const App = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedImageIndex]);
+  }, [selectedImageIndex, handleNextImage, handlePrevImage, showMembershipModal]);
 
   const getEventsForDay = useCallback((date, panchang) => {
     const events = [];
@@ -343,6 +378,9 @@ const App = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const handleNavigation = (e, href) => {
     e.preventDefault();
+    if (typeof window.history.pushState === 'function') {
+      window.history.pushState(null, '', href);
+    }
     if (currentView === 'gallery') {
       setCurrentView('home');
       setTimeout(() => {
@@ -364,15 +402,6 @@ const App = () => {
       }
     }
     setIsMenuOpen(false);
-  };
-
-  const handleNextImage = (e) => {
-    if (e) e.stopPropagation();
-    setSelectedImageIndex((prev) => (prev + 1) % fullGalleryImages.length);
-  };
-  const handlePrevImage = (e) => {
-    if (e) e.stopPropagation();
-    setSelectedImageIndex((prev) => (prev - 1 + fullGalleryImages.length) % fullGalleryImages.length);
   };
 
   const getNavbarBg = () => {
@@ -542,7 +571,7 @@ const App = () => {
           <section className="relative bg-emerald-900 py-0 overflow-hidden">
             <div className="grid md:grid-cols-2 h-auto md:h-[600px]">
               <div className="relative group overflow-hidden h-96 md:h-full">
-                <img src="https://images.unsplash.com/photo-1506461883276-594a12b11cf3?q=80&w=2000&auto=format&fit=crop" alt="Kerala Backwaters" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                <img src="kerala-backwaters.jpg" alt="Kerala Backwaters" className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" loading="lazy" />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex flex-col justify-center items-center text-center p-8">
                   <h3 className="text-4xl md:text-5xl font-serif font-bold text-white mb-2 tracking-wide">Kerala</h3>
                   <p className="text-amber-300 font-medium uppercase tracking-widest text-sm">God's Own Country</p>
@@ -579,23 +608,31 @@ const App = () => {
                   <h3 className="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
                     <Facebook className="text-blue-600" /> Community Feed
                   </h3>
-                  <div className="w-full max-w-[375px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white">
-                    <iframe 
-                      src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=375&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`} 
-                      width="100%" 
-                      height="800" 
-                      style={{border:'none', overflow:'hidden', maxWidth: '100%'}} 
-                      scrolling="no" 
-                      frameBorder="0" 
-                      allowFullScreen={true} 
-                      title="Facebook Timeline Feed"
-                    ></iframe>
+                  <div ref={fbFeedRef} className="w-full max-w-[375px] bg-white rounded-xl shadow-2xl overflow-hidden border-4 border-white" style={{ minHeight: 800 }}>
+                    {fbFeedVisible ? (
+                      <iframe
+                        src={`https://www.facebook.com/plugins/page.php?href=${encodedFbUrl}&tabs=timeline&width=375&height=800&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true&appId`}
+                        width="100%"
+                        height="800"
+                        style={{border:'none', overflow:'hidden', maxWidth: '100%'}}
+                        scrolling="no"
+                        frameBorder="0"
+                        allowFullScreen={true}
+                        title="Facebook Timeline Feed"
+                        loading="lazy"
+                      ></iframe>
+                    ) : (
+                      <div className="flex items-center justify-center h-[800px] text-slate-400 text-sm animate-pulse">Loading community feed…</div>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col items-center w-full h-full">
-                  <h3 className="text-2xl font-bold text-emerald-800 mb-6 flex items-center gap-2">
+                  <h3 className="text-2xl font-bold text-emerald-800 mb-2 flex items-center gap-2">
                     <CalendarIcon className="text-amber-500" /> Malayalam Calendar
                   </h3>
+                  <p className="text-xs text-slate-500 mb-4 flex items-center gap-1.5 text-center">
+                    <Info size={14} className="shrink-0" /> Dates and festival days are approximate (calculated locally) — please confirm important dates with an authoritative Panchangam.
+                  </p>
                   {/* Calendar Widget - Full Width */}
                   <div className="w-full bg-white/95 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl overflow-hidden ring-1 ring-black/5 h-full flex flex-col">
                     {/* Header */}
@@ -619,9 +656,13 @@ const App = () => {
                             const firstEvent = data.events.length > 0 ? data.events[0].name : null;
                             
                             return (
-                              <div 
-                                key={idx} 
+                              <div
+                                key={idx}
                                 onClick={() => setSelectedDay(data)}
+                                role="button"
+                                tabIndex={0}
+                                aria-label={`${data.date.toDateString()}${firstEvent ? `, ${firstEvent}` : ''}`}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedDay(data); } }}
                                 className={`min-h-[80px] p-1 bg-white cursor-pointer hover:bg-emerald-50 transition-colors flex flex-col justify-between ${!data.isCurrentMonth ? 'text-gray-300' : ''} ${today ? 'bg-emerald-100 ring-1 ring-emerald-500 z-10' : ''} ${hasMajor && data.isCurrentMonth ? 'bg-amber-50' : ''}`}
                               >
                                 <div className="flex justify-between items-start">
@@ -675,8 +716,16 @@ const App = () => {
                </div>
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {fullGalleryImages.slice(0, 9).map((img, index) => (
-                    <div key={img.id} className={`relative rounded-2xl overflow-hidden group shadow-md cursor-pointer ${index === 0 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1 aspect-video'}`} onClick={() => setSelectedImageIndex(index)}>
-                      <img src={img.src} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={img.alt} />
+                    <div
+                      key={img.id}
+                      className={`relative rounded-2xl overflow-hidden group shadow-md cursor-pointer ${index === 0 ? 'col-span-2 row-span-2' : 'col-span-1 row-span-1 aspect-video'}`}
+                      onClick={() => setSelectedImageIndex(index)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`View ${img.alt}`}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedImageIndex(index); } }}
+                    >
+                      <img src={img.src} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={img.alt} loading={index === 0 ? undefined : 'lazy'} />
                     </div>
                   ))}
                </div>
@@ -707,7 +756,15 @@ const App = () => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                {fullGalleryImages.map((img, index) => (
-                 <div key={img.id} className="relative aspect-square rounded-xl overflow-hidden group shadow-sm hover:shadow-xl cursor-pointer" onClick={() => setSelectedImageIndex(index)}>
+                 <div
+                   key={img.id}
+                   className="relative aspect-square rounded-xl overflow-hidden group shadow-sm hover:shadow-xl cursor-pointer"
+                   onClick={() => setSelectedImageIndex(index)}
+                   role="button"
+                   tabIndex={0}
+                   aria-label={`View ${img.alt}`}
+                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedImageIndex(index); } }}
+                 >
                    <img src={img.src} alt={img.alt} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" loading="lazy" />
                  </div>
                ))}
@@ -758,8 +815,18 @@ const App = () => {
 
       {/* Modals: Membership & Calendar Details */}
       {showMembershipModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-           <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all scale-100 animate-scale-in">
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowMembershipModal(false)}
+          role="presentation"
+        >
+           <div
+             className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full relative transform transition-all scale-100 animate-scale-in"
+             onClick={(e) => e.stopPropagation()}
+             role="dialog"
+             aria-modal="true"
+             aria-label="Membership form downloaded"
+           >
              <button onClick={() => setShowMembershipModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"><X size={24} /></button>
              <div className="flex flex-col items-center text-center">
                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6"><CheckCircle size={32} /></div>
