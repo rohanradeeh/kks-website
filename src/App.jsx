@@ -426,7 +426,7 @@ const App = () => {
     if (typeof window.history.pushState === 'function') {
       window.history.pushState(null, '', href);
     }
-    // scroll-mt-28 on each section handles the fixed-nav offset, so a plain
+    // scroll-mt-24 on each section handles the fixed-nav offset, so a plain
     // scrollIntoView lands correctly whether the nav is in its tall
     // (unscrolled) or short (scrolled) state.
     if (currentView === 'gallery') {
@@ -550,7 +550,7 @@ const App = () => {
           {/* About Section */}
           <section className="py-24 md:py-36 relative overflow-hidden">
             <MuralLineArt className="hidden lg:block absolute top-10 right-8 w-28 h-36 opacity-70" />
-            <div id="about" className="container mx-auto px-4 md:px-6 scroll-mt-28">
+            <div id="about" className="container mx-auto px-4 md:px-6 scroll-mt-24">
               <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
                 <div className="lg:w-1/2 relative w-full">
                   <div className="absolute -top-4 -left-4 w-full h-full border border-gold/40 rounded-2xl hidden sm:block" aria-hidden="true"></div>
@@ -589,8 +589,8 @@ const App = () => {
 
           {/* Mission Section */}
           <section className="py-24 bg-ink text-ivory">
-            <div id="mission" className="container mx-auto px-4 md:px-6 scroll-mt-28">
-               <Reveal className="max-w-2xl mb-16">
+            <div id="mission" className="container mx-auto px-4 md:px-6 scroll-mt-24">
+               <Reveal className="max-w-2xl mb-10">
                 <p className="font-accent italic text-xl text-gold-light mb-3">Why we exist</p>
                 <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">What guides us</h2>
                 <p className="text-ivory/60">Guided by principles of dignity, integrity, and cultural pride, we strive to build a stronger community.</p>
@@ -666,14 +666,14 @@ const App = () => {
 
           {/* EVENTS & CALENDAR SECTION */}
           <section className="relative py-24 overflow-hidden bg-cream border-y border-gold/15">
-            <div id="events" className="container mx-auto px-4 md:px-6 relative z-10 scroll-mt-28">
-              <Reveal className="max-w-2xl mb-16">
+            <div id="events" className="container mx-auto px-4 md:px-6 relative z-10 scroll-mt-24">
+              <Reveal className="max-w-2xl mb-10">
                 <p className="font-accent italic text-xl text-gold-dark mb-3">What's happening</p>
                 <h2 className="text-3xl md:text-4xl font-display font-bold text-ink">Latest news &amp; events</h2>
               </Reveal>
               <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 items-start">
                 <div className="flex flex-col items-center w-full">
-                  <h3 className="text-xl font-display font-semibold text-ink mb-6 flex items-center gap-2 self-start">
+                  <h3 className="text-xl font-display font-semibold text-ink mb-4 flex items-center gap-2 self-start">
                     <Facebook size={20} className="text-backwater" /> Community feed
                   </h3>
                   <div ref={fbFeedRef} className="w-full max-w-[375px] bg-white rounded-xl overflow-hidden border border-gold/20 shadow-sm" style={{ minHeight: 800 }}>
@@ -695,7 +695,7 @@ const App = () => {
                   </div>
                 </div>
                 <div className="flex flex-col items-center w-full h-full">
-                  <h3 className="text-xl font-display font-semibold text-ink mb-6 flex items-center gap-2 self-start">
+                  <h3 className="text-xl font-display font-semibold text-ink mb-4 flex items-center gap-2 self-start">
                     <CalendarIcon size={20} className="text-gold-dark" /> Malayalam calendar
                   </h3>
                   <div className="w-full bg-white border border-gold/15 shadow-sm rounded-3xl overflow-hidden h-full flex flex-col">
@@ -770,7 +770,7 @@ const App = () => {
 
           {/* Gallery Preview Section */}
           <section className="py-24 bg-cream">
-            <div id="gallery" className="container mx-auto px-4 md:px-6 scroll-mt-28">
+            <div id="gallery" className="container mx-auto px-4 md:px-6 scroll-mt-24">
                <Reveal className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10">
                  <div className="text-left mb-6 md:mb-0">
                   <p className="font-accent italic text-xl text-gold-dark mb-3">Our memories</p>
@@ -803,7 +803,7 @@ const App = () => {
           <section className="py-24 bg-backwater text-ivory relative overflow-hidden">
              <div className="absolute inset-0 opacity-[0.07]" style={{ backgroundImage: 'radial-gradient(#C89A42 1px, transparent 1px)', backgroundSize: '28px 28px' }}></div>
              <HouseboatCrossing />
-             <Reveal id="membership" className="container mx-auto px-4 md:px-6 relative z-10 text-center scroll-mt-28">
+             <Reveal id="membership" className="container mx-auto px-4 md:px-6 relative z-10 text-center scroll-mt-24">
                <h2 className="text-3xl md:text-5xl font-display font-bold mb-8">Become a part of our family</h2>
                <button onClick={handleMembershipClick} className="bg-gold hover:bg-gold-dark text-ink px-8 py-3.5 rounded-full font-display font-bold inline-flex items-center gap-2 transition-colors"><FileDown size={20} /> Apply for membership</button>
              </Reveal>
@@ -838,7 +838,7 @@ const App = () => {
 
       {/* Footer */}
       <footer className="bg-ink text-ivory/60 py-16">
-         <div id="contact" className="container mx-auto px-4 md:px-6 scroll-mt-28">
+         <div id="contact" className="container mx-auto px-4 md:px-6 scroll-mt-24">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 border-b border-ivory/10 pb-12">
             <div>
                <div className="flex items-center gap-3 mb-6">
